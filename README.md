@@ -1,11 +1,10 @@
 A WhatsApp weather bot that sends daily weather updates using Twilio.
 
-- Sends today's weather at 08:30 and tomorrow's forecast at 18:00.
-- Retrieves and formats weather data including temperature, sun hours, wind, rain, and cloudiness.
-- Uses scheduling to run locally or in a hosted environment like Fly.io.
+Sends today's weather at 08:30 and tomorrow's forecast at 18:00 using GitHub Actions cron jobs that run weather_bot.py on a Fly.io machine.
 
-## Example output
-Lund tomorrow:
+
+## Example WhatsApp message
+Weather tomorrow:
 - Clouds / Clear
 - Sun: 6h
 - 21° / 16°

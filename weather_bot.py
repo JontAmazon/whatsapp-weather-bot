@@ -1,22 +1,25 @@
 """
 weather_bot.py
 
-A WhatsApp weather bot that sends daily weather updates using Twilio.
+A WhatsApp weather bot that sends daily weather
+to a specified phone number updates using Twilio.
 
-- Sends today's weather at 08:30 and tomorrow's forecast at 18:00.
-- Retrieves and formats weather data including temperature, sun hours, wind, rain, and cloudiness.
-- Uses scheduling to run locally or in a hosted environment like Fly.io.
+- Sends today's or tomorrow's weather forecast (argument).
+- Retrieves and formats weather data including
+  temperature, sun hours, wind, rain, and cloudiness.
 """
 
 import os
 import time
+import argparse
 import requests
 from dotenv import load_dotenv
-import schedule
 from datetime import datetime, timedelta
 from datetime import time as dtime
 from twilio.rest import Client
 from collections import Counter
+
+from stop_fly_machine import stop_machine
 
 # Load environment variables
 load_dotenv()
@@ -128,12 +131,6 @@ def fetch_weather(is_tomorrow=False):
 
     return msg
 
-def send_today_weather():
-    send_weather_message(is_tomorrow=False)
-
-def send_tomorrow_weather():
-    send_weather_message(is_tomorrow=True)
-
 def send_weather_message(is_tomorrow=False):
     body = fetch_weather(is_tomorrow)
     message = twilio_client.messages.create(
@@ -144,14 +141,31 @@ def send_weather_message(is_tomorrow=False):
     # print("Message sent:", message.sid)
 
 if __name__ == "__main__":
-    #send_weather_message(is_tomorrow=True)
+    # NOTE: this script is run from GitHub Actions:
+    # flyctl machines start ${{ secrets.FLY_MACHINE_ID }} -a ${{ secrets.FLY_APP_NAME }} -d '{"entrypoint":["python","weather_bot.py"]}'
+    # flyctl machines start ${{ secrets.FLY_MACHINE_ID }} -a ${{ secrets.FLY_APP_NAME }} -d '{"entrypoint":["python","weather_bot.py","--tomorrow"]}'
+    
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--tomorrow",
+        action="store_true",
+        help="Send weather message for tomorrow instead of today",
+    )
+    parser.add_argument(
+        "--localonly",
+        action="store_true",
+        help="Run locally, not on fly.io machine",
+    )
+    args = parser.parse_args()
 
-    # Schedule
-    schedule.every().day.at("08:30").do(send_today_weather)
-    schedule.every().day.at("18:00").do(send_tomorrow_weather)
 
-    # Keep running
-    while True:
-        schedule.run_pending()
-        time.sleep(30)
+    if args.localonly:
+        send_weather_message(is_tomorrow=args.tomorrow)
 
+    else:
+        send_weather_message(is_tomorrow=args.tomorrow)
+
+        # Finally, stop the fly.io machine
+        time.sleep(5)
+        print("Weather bot finished running. Stopping the fly.io machine.")
+        stop_machine()
