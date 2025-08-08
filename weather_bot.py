@@ -58,9 +58,28 @@ def fetch_weather(is_tomorrow=False):
         "appid": weather_api_key,
         "units": "metric"
     }
-    response = requests.get(weather_url, params=params)
-    data = response.json()
-    # print(f"\n\n{data=}\n\n")
+
+
+    # -------------------------------------------------
+    # TODO later: separate function/file.
+    try:
+        response = requests.get(weather_url, params=params)
+        response.raise_for_status()  # Raises HTTPError for 4xx/5xx responses
+    except requests.exceptions.HTTPError as http_err:
+        status = response.status_code
+        if 400 <= status < 500:
+            print(f"Client error: {status} - {response.text}")
+        elif 500 <= status < 600:
+            print(f"Server error: {status} - {response.text}")
+        else:
+            print(f"Unexpected HTTP error: {http_err}")
+    except requests.exceptions.RequestException as err:
+        print(f"Request failed: {err}")
+    else:
+        data = response.json()
+        print(f"\n\n{data=}\n\n")
+    # -------------------------------------------------
+
 
     # today or tomorrow?
     if is_tomorrow:
