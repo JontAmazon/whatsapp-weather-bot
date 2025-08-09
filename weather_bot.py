@@ -139,13 +139,13 @@ def fetch_weather():
         msg += f"- {most_common1} \n"
     msg += f"- {round(max(temps))}° / {round(min(temps))}°\n"
     msg += f"- Sun: *{sun_hours}h*\n"
-    if avg_rain < 0.1:
+    if round(avg_rain) == 0:
         msg += f"- No rain :)\n"
     else:
         # msg += f"- Rain: {max(rains)} / {min(rains)} // {avg_rain} mm\n"
         msg += f"- Max rain: {max(rains)} mm\n"
-        msg += f"- Avg rain: {avg_rain} mm\n"
-    msg += f"- Clouds: {avg_clouds}\n\n"
+        msg += f"- Avg rain: {round(avg_rain)} mm\n"
+    msg += f"- Clouds: {round(avg_clouds)}\n\n"
 
     msg += f"- Wind: {round(max(winds))} - {round(min(winds))} m/s\n"
     msg += f"- Gust: {round(max(gusts))} - {round(min(gusts))} m/s\n"
