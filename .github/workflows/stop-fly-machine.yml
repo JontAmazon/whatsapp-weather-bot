@@ -4,6 +4,9 @@ on:
   workflow_run:
     workflows:
       - Weather Bot Every 5 min
+      - Weather Bot Today's Forecast
+      - Weather Bot Tomorrow's Forecast
+      - Weather Bot Manual Dispatch
     types:
       - completed
 
