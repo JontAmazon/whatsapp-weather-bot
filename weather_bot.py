@@ -182,9 +182,5 @@ if __name__ == "__main__":
     
     send_weather_message()
 
-    IS_FLY_MACHINE = os.getenv("IS_FLY_MACHINE") or False
-    if IS_FLY_MACHINE:
-        # Finally, stop the fly.io machine
-        time.sleep(5)
-        print("Weather bot finished running. Stopping the fly.io machine.")
-        stop_machine()
+    # note: uncommented code to stop fly machine,
+    # see notes in notes/stop_fly_machine.md

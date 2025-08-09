@@ -1,3 +1,14 @@
+""" DEPRECATED: This script is no longer used."""
+""" DEPRECATED: This script is no longer used."""
+""" DEPRECATED: This script is no longer used."""
+
+""" REMOVE SOON."""
+""" REMOVE SOON."""
+""" REMOVE SOON."""
+
+
+
+
 """ After weather_bot.py is run, run this script to stop the fly.io machine. """
 import os
 import requests
