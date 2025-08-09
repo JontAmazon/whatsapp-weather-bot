@@ -12,6 +12,7 @@ to a specified phone number updates using Twilio.
 import os
 import time
 import argparse
+import json
 import requests
 from dotenv import load_dotenv
 from datetime import datetime, timedelta
@@ -35,10 +36,11 @@ twilio_client = Client(account_sid, auth_token)
 weather_api_key = os.getenv("WEATHER_API_KEY")
 lat = os.getenv("LAT")
 lon = os.getenv("LON")
+tomorrow = os.getenv("TOMORROW", ) or False
 weather_url = "https://api.openweathermap.org/data/2.5/forecast"
 
 
-def fetch_weather(is_tomorrow=False):
+def fetch_weather():
     """ Fetch weather data from api.openweathermap.org,
     then just do a bunch of formatting etc.
     
@@ -77,12 +79,12 @@ def fetch_weather(is_tomorrow=False):
         print(f"Request failed: {err}")
     else:
         data = response.json()
-        print(f"\n\n{data=}\n\n")
+        # print(f"\n\n{data=}\n\n")
     # -------------------------------------------------
 
 
     # today or tomorrow?
-    if is_tomorrow:
+    if tomorrow:
         target_date = (datetime.now() + timedelta(days=1)).date()
     else:
         target_date = datetime.now().date()
@@ -128,7 +130,7 @@ def fetch_weather(is_tomorrow=False):
     else:
         most_common2 = None
 
-    day = "tomorrow" if is_tomorrow else "today"
+    day = "tomorrow" if tomorrow else "today"
     msg = f"🌤 Weather {day}:\n"
     # msg = f"🌤 Weather {target_date}:\n"
     if most_common2:
@@ -150,40 +152,38 @@ def fetch_weather(is_tomorrow=False):
 
     return msg
 
-def send_weather_message(is_tomorrow=False):
-    body = fetch_weather(is_tomorrow)
-    message = twilio_client.messages.create(
-        body=body,
-        from_=whatsapp_from,
-        to=whatsapp_to
-    )
-    # print("Message sent:", message.sid)
+def send_weather_message():
+    try:
+        body = fetch_weather()
+        # print(f"[DEBUG] fetch_weather returned type={type(body)} value={repr(body)}")
+        if not body:
+            raise ValueError("Weather body is empty or None")
+
+        print(f"Sending WhatsApp message from {whatsapp_from} to {whatsapp_to}.")
+        message = twilio_client.messages.create(
+            body=body,
+            from_=whatsapp_from,
+            to=whatsapp_to
+        )
+
+        print(f"[DEBUG] Twilio response SID={message.sid}")
+        print("[INFO] Message sent successfully.")
+
+    except Exception as e:
+        print("[ERROR] send_weather_message failed!")
+        print(f"[ERROR] Exception type: {type(e).__name__}")
+        print(f"[ERROR] Exception message: {str(e)}")
+        # print("[ERROR] Full traceback:")
+        # traceback.print_exc()
+        print("[DEBUG] Locals snapshot:")
+        print(json.dumps({k: repr(v) for k, v in locals().items()}, indent=2))
 
 if __name__ == "__main__":
-    # NOTE: this script is run from GitHub Actions:
-    # flyctl machines start ${{ secrets.FLY_MACHINE_ID }} -a ${{ secrets.FLY_APP_NAME }} -d '{"entrypoint":["python","weather_bot.py"]}'
-    # flyctl machines start ${{ secrets.FLY_MACHINE_ID }} -a ${{ secrets.FLY_APP_NAME }} -d '{"entrypoint":["python","weather_bot.py","--tomorrow"]}'
     
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--tomorrow",
-        action="store_true",
-        help="Send weather message for tomorrow instead of today",
-    )
-    parser.add_argument(
-        "--localonly",
-        action="store_true",
-        help="Run locally, not on fly.io machine",
-    )
-    args = parser.parse_args()
+    send_weather_message()
 
-
-    if args.localonly:
-        send_weather_message(is_tomorrow=args.tomorrow)
-
-    else:
-        send_weather_message(is_tomorrow=args.tomorrow)
-
+    IS_FLY_MACHINE = os.getenv("IS_FLY_MACHINE") or False
+    if IS_FLY_MACHINE:
         # Finally, stop the fly.io machine
         time.sleep(5)
         print("Weather bot finished running. Stopping the fly.io machine.")
