@@ -12,7 +12,7 @@ jobs:
       - name: Start machine
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
-          TOMORROW: "false"  # today or tomorrow
+          TOMORROW: "true"  # today or tomorrow
         run: |
           flyctl machine start ${{ secrets.MACHINE_ID }} \
           -a ${{ secrets.FLY_APP_NAME }}

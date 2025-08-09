@@ -3,12 +3,13 @@ import os
 import requests
 
 def stop_machine():
-    machine_id = os.getenv("FLY_MACHINE_ID")
+    machine_id = os.getenv("MACHINE_ID")
     app_name = os.getenv("FLY_APP_NAME")
     access_token = os.getenv("FLY_API_TOKEN")
 
     if not all([machine_id, app_name, access_token]):
-        raise Exception("Error! Missing env vars for stopping machine")
+        raise Exception(f"Error! Missing env vars for stopping machine"
+                        f"{machine_id=}, {app_name=}, {access_token=}")
 
     url = f"https://api.machines.fly.io/v1/apps/{app_name}/machines/{machine_id}/stop"
     headers = {
@@ -23,6 +24,5 @@ def stop_machine():
         raise Exception(f"Failed to stop machine: {e}")
 
     print("Sent stop request to fly.io machine.")
-    # print("Stop response:", response.status_code, response.text)
     print("Stop request response code:", response.status_code)
 
