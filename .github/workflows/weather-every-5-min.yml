@@ -2,8 +2,8 @@ name: Weather Bot Every 5 min
 
 on:
   workflow_dispatch:
-  # schedule:
-  #   - cron: '*/5 * * * *'
+  #schedule:
+  #  - cron: '*/1 * * * *'
 
 jobs:
   send-forecast:

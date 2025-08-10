@@ -1,6 +1,7 @@
 name: Weather Bot Tomorrow's Forecast
 
 on:
+  workflow_dispatch:
   schedule:
     - cron: '16 16 * * *'  # 18:00 Sweden time
 

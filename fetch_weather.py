@@ -12,8 +12,13 @@ load_dotenv()
 weather_api_key = os.getenv("WEATHER_API_KEY")
 lat = os.getenv("LAT")
 lon = os.getenv("LON")
-tomorrow = os.getenv("TOMORROW", ) or False
+tomorrow = os.getenv("TOMORROW", False)
 weather_url = "https://api.openweathermap.org/data/2.5/forecast"
+
+print(f"{weather_api_key=}")
+print(f"{lat=}")
+print(f"{lon=}")
+print(f"{tomorrow=}")
 
 def fetch_weather():
     """ Fetch weather data from api.openweathermap.org,
@@ -51,8 +56,11 @@ def fetch_weather():
     except requests.exceptions.RequestException as err:
         print(f"Request failed: {err}")
     else:
+        print(f"[DEBUG] Response headers: {response.headers}") # tmp
+        print(f"[DEBUG] First 500 chars of body: {response.text[:500]}") # tmp 
+
         data = response.json()
-        # print(f"\n\n{data=}\n\n")
+        print(f"\n\n{data=}\n\n")
 
     # today or tomorrow?
     if tomorrow:
