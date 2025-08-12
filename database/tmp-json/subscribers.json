@@ -1,0 +1,34 @@
+[
+    {
+        "phone_number": "whatsapp:+46760944048",
+        "location": "Lund",
+        "lon": "13.1910",
+        "lat": "55.7047",
+        "preferences": {
+            "channel": "whatsapp",
+            "send_time_morning": "08:00",
+            "send_time_afternoon": "19:00",
+            "wind": true,
+            "gust": true,
+            "gif": false,
+            "forecast_days": 1,
+            "only_weird_weather": false
+        }
+    },
+    {
+        "phone_number": "whatsapp:+46760944048",
+        "location": "Valencia",
+        "lon": "0.3756",
+        "lat": "39.4738",
+        "preferences": {
+            "channel": "whatsapp",
+            "send_time_morning": "07:00",
+            "send_time_afternoon": "18:00",
+            "wind": true,
+            "gust": true,
+            "gif": true,
+            "forecast_days": 1,
+            "only_weird_weather": false
+        }
+    }
+]

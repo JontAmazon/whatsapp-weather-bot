@@ -10,21 +10,16 @@ from collections import Counter
 # Load environment variables
 load_dotenv()
 weather_api_key = os.getenv("WEATHER_API_KEY")
-lat = os.getenv("LAT")
-lon = os.getenv("LON")
-tomorrow = os.getenv("TOMORROW", "").lower() == "true"
 weather_url = "https://api.openweathermap.org/data/2.5/forecast"
 
-print(f"{weather_api_key=}")
-print(f"{lat=}")
-print(f"{lon=}")
-print(f"{tomorrow=}")
 
-def fetch_weather():
-    """ Fetch weather data from api.openweathermap.org,
-    then just do a bunch of formatting etc.
+def fetch_weather(location, lon, lat, tomorrow: bool, forecast_days: int) -> str:
+    """ Fetch weather data from api.openweathermap.org and format it nicely.
     
-    :return: String. Example:
+    :param tomorrow: Boolean. If True, fetch weather for tomorrow, otherwise for today.
+    :param forecast_days: Not yet implemented...
+
+    :return: Example string:
         Weather tomorrow:
         - Clouds / Clear
         - 21° / 16°
@@ -59,9 +54,10 @@ def fetch_weather():
         print(f"[DEBUG] First 500 chars of body: {response.text[:500]}") # tmp 
 
         data = response.json()
-        print(f"\n\n{data=}\n\n")
+        # print(f"\n\n{data=}\n\n")
 
-    # today or tomorrow?
+
+    # Step 2. Filter the data for the target date
     if tomorrow:
         target_date = (datetime.now() + timedelta(days=1)).date()
     else:
@@ -108,20 +104,22 @@ def fetch_weather():
     else:
         most_common2 = None
 
-    ### Format the message
+    ### ------------- Format the message ----------------
     day = "tomorrow" if tomorrow else "today"
-    msg = f"🌤 Weather {day}:\n"
-    # msg = f"🌤 Weather {target_date}:\n"
+    msg = f"🌤 Weather in {location} {day}:\n"
+    
+    # Weather type, e.g. "Clouds / Clear"
     if most_common2:
         msg += f"- {most_common1} / {most_common2}\n"
     else:
         msg += f"- {most_common1} \n"
+    
+    # Temperature:
     msg += f"- {round(max(temps))}° / {round(min(temps))}°\n"
-    # msg += f"- Sun: *{sun_hours}h*\n"
-    
     msg += f"- Clouds: {round(avg_clouds)}\n\n"
-    
-    ### RAIN:
+    # msg += f"- Sun: *{sun_hours}h*\n"
+
+    # Rain:
     if round(avg_rain) == 0:
         msg += f"- No rain :)\n"
         msg += f"- Max rain: {max(rains)} mm\n"      # tmp debug; TODO remove later
@@ -131,8 +129,14 @@ def fetch_weather():
         msg += f"- Max rain: {max(rains)} mm\n"
         msg += f"- Avg rain: {round(avg_rain)} mm\n"
 
-    ### WIND:
+    # Wind:
     msg += f"- Wind: {round(min(winds))} - {round(max(winds))} m/s\n"
     msg += f"- Gust: {round(min(gusts))} - {round(max(gusts))} m/s\n"
 
+
+    if not msg:
+        raise ValueError("Weather forecast is empty or None"
+                         f"All weather data fetched for the location: {data=}")
+
     return msg
+
