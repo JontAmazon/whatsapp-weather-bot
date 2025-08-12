@@ -56,20 +56,21 @@ def fetch_weather(location, lon, lat, tomorrow: bool, forecast_days: int) -> str
         data = response.json()
         # print(f"\n\n{data=}\n\n")
 
-
-    # Step 2. Filter the data for the target date
-    if tomorrow:
-        target_date = (datetime.now() + timedelta(days=1)).date()
-    else:
-        target_date = datetime.now().date()
-
-    sun_hours = 0
+    # Define variables
+    # sun_hours = 0; # if weather_type_3h == "Clear": sun_hours += 3
     temps = []
     winds = []
     gusts = []
     rains = []
     clouds = []
     weather_type = []
+    weather_emoji = []
+
+    # Filter the data for the target date
+    if tomorrow:
+        target_date = (datetime.now() + timedelta(days=1)).date()
+    else:
+        target_date = datetime.now().date()
 
     for item in data["list"]:
         time = datetime.fromtimestamp(item["dt"])
@@ -83,19 +84,38 @@ def fetch_weather(location, lon, lat, tomorrow: bool, forecast_days: int) -> str
         rains.append(item.get("rain", {}).get("3h", 0))
         gusts.append(item["wind"].get("gust", {0}))
         clouds.append(item["clouds"]["all"])
-        weather_type_3h = item["weather"][0]["main"]
-        print(f"{time.time()}: {weather_type_3h=}")
-        weather_type.append(weather_type_3h)
-        if weather_type_3h == "Clear":
-            sun_hours += 3
+        weather_type.append(item["weather"][0]["main"])
 
     if not temps:
         return "No weather data available."
+    
 
-    avg_wind = sum(winds) / len(winds)
-    avg_rain = sum(rains) / len(rains) if rains else 0
+    # Translate into emojis
+    for weather_type_3h in weather_type:
+        print(f"{time.time()}: {weather_type_3h=}")
+        if weather_type_3h == "Clouds":
+            weather_emoji.append("☁️")
+        elif weather_type_3h == "Clear":
+            weather_emoji.append("☀️")
+        elif weather_type_3h == "Rain":
+            weather_emoji.append("🌧")
+
     avg_clouds = sum(clouds) / len(clouds)
+    avg_rain = sum(rains) / len(rains) if rains else 0
+    avg_wind = sum(winds) / len(winds)
 
+    ### ------------- Format the message ----------------
+    which_day = "tomorrow" if tomorrow else "today"
+    msg = f"🌤 {location} {which_day}:\n"
+    # msg = f"{location} {which_day}:\n"  # use this one when emojis work?
+    
+    """ # message += weather emojis
+    for emoji in weather_emoji:
+        msg += emoji + " "
+    msg += "\n"
+    """
+    
+    """ # message += weather type in words
     counts = Counter(weather_type)
     most_common = counts.most_common(2)
     most_common1 = most_common[0][0]
@@ -103,16 +123,11 @@ def fetch_weather(location, lon, lat, tomorrow: bool, forecast_days: int) -> str
         most_common2 = most_common[1][0]
     else:
         most_common2 = None
-
-    ### ------------- Format the message ----------------
-    day = "tomorrow" if tomorrow else "today"
-    msg = f"🌤 Weather in {location} {day}:\n"
-    
-    # Weather type, e.g. "Clouds / Clear"
     if most_common2:
         msg += f"- {most_common1} / {most_common2}\n"
     else:
         msg += f"- {most_common1} \n"
+    """
     
     # Temperature:
     msg += f"- {round(max(temps))}° / {round(min(temps))}°\n"

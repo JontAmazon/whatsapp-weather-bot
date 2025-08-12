@@ -59,12 +59,21 @@ if __name__ == "__main__":
     with open('database/tmp-json/subscribers.json', 'r') as f:
         subscribers = json.load(f)
 
+        counter = 0
         for subscriber in subscribers:
+
+            # if counter >= 1:  # for testing, only send to one subscriber
+            #     break
+
             whatsapp_to = subscriber['phone_number']
             location = subscriber['location']
             lon = subscriber['lon']
             lat = subscriber['lat']
             tomorrow = True
+                # TODO later: here's a way how to get "TOMORROW":
+                # - cron job every hour
+                # - check both "send_time_morning" and "send_time_evening", and sets
+                # `TOMORROW` according to which one the current time matches with.
             forecast_days = subscriber.get('forecast_days', 1)
             
             # Fetch weather data
@@ -76,3 +85,5 @@ if __name__ == "__main__":
 
             # Send WhatsApp message
             send_weather_message(whatsapp_to, weather_forecast)
+
+            counter = counter + 1
