@@ -11,10 +11,10 @@ jobs:
     steps:
       - name: Set up flyctl
         uses: superfly/flyctl-actions/setup-flyctl@master
-      - name: Start machine
+      - name: SSH and run weather_bot.py
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
         run: |
           flyctl secrets set TOMORROW=true -a "${{ secrets.FLY_APP_NAME }}"
-          flyctl machine start ${{ secrets.MACHINE_ID }} \
-          -a ${{ secrets.FLY_APP_NAME }}
+          flyctl ssh console -a weather-whatsapp-bot --command "python weather_bot.py"
+

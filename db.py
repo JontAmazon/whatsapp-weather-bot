@@ -31,10 +31,25 @@ def get_conn(db_path: str) -> sqlite3.Connection:
 
 def init_db(db_path: str):
     """Create database and table if not exists"""
-    conn = get_conn(db_path)
-    with conn:
-        conn.execute(CREATE_TABLE_SQL)
-    conn.close()
+
+    for _ in range(3):
+        print()
+    for _ in range(3):
+        print(f"Initializing database at {db_path}...")
+
+    print("Checking /data...")
+    print("Exists:", os.path.exists("/data"))
+    print("Contents:", os.listdir("/data"))
+    os.chmod("/data", 0o777)  # shouldn't be necessary
+
+    try:
+        conn = get_conn(db_path)
+        with conn:
+            conn.execute(CREATE_TABLE_SQL)
+    except Exception as e:
+        print("Database init failed:", e)
+    finally:
+        conn.close()
 
 def row_to_dict(row: sqlite3.Row) -> Dict[str, Any]:
     return {k: row[k] for k in row.keys()}

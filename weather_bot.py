@@ -63,13 +63,13 @@ def send_weather_message(whatsapp_to: str, weather_forecast: str):
 
 
 if __name__ == "__main__":
-    print("weather_bot starting — reading subscribers from DB:", DB_PATH)
+    for _ in range(10):
+        print()
+    for _ in range(10):
+        print("weather_bot starting — reading subscribers from DB:", DB_PATH)
     subscribers = get_all_subscribers(DB_PATH)
     print(f"Found {len(subscribers)} subscribers.")
-
-    # tmp solution: load subscribers from JSON file
-    #with open('database/tmp-json/subscribers.json', 'r') as f:
-    #    subscribers = json.load(f)
+    print(f"{subscribers=}")
 
     counter = 0
     for subscriber in subscribers:
