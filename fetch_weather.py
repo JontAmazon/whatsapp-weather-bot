@@ -12,7 +12,7 @@ load_dotenv()
 weather_api_key = os.getenv("WEATHER_API_KEY")
 lat = os.getenv("LAT")
 lon = os.getenv("LON")
-tomorrow = os.getenv("TOMORROW", False)
+tomorrow = os.getenv("TOMORROW", "").lower() == "true"
 weather_url = "https://api.openweathermap.org/data/2.5/forecast"
 
 print(f"{weather_api_key=}")
@@ -27,12 +27,11 @@ def fetch_weather():
     :return: String. Example:
         Weather tomorrow:
         - Clouds / Clear
-        - Sun: 6h
         - 21° / 16°
         - No rain :)
         - Clouds: 40.6
-        - Wind: 5 - 3 m/s
-        - Gust: 6 - 4 m/s
+        - Wind: 3 - 5 m/s
+        - Gust: 4 - 6 m/s
     """
 
     params = {
@@ -109,6 +108,7 @@ def fetch_weather():
     else:
         most_common2 = None
 
+    ### Format the message
     day = "tomorrow" if tomorrow else "today"
     msg = f"🌤 Weather {day}:\n"
     # msg = f"🌤 Weather {target_date}:\n"
@@ -117,16 +117,22 @@ def fetch_weather():
     else:
         msg += f"- {most_common1} \n"
     msg += f"- {round(max(temps))}° / {round(min(temps))}°\n"
-    msg += f"- Sun: *{sun_hours}h*\n"
+    # msg += f"- Sun: *{sun_hours}h*\n"
+    
+    msg += f"- Clouds: {round(avg_clouds)}\n\n"
+    
+    ### RAIN:
     if round(avg_rain) == 0:
         msg += f"- No rain :)\n"
+        msg += f"- Max rain: {max(rains)} mm\n"      # tmp debug; TODO remove later
+        msg += f"- Avg rain: {round(avg_rain)} mm\n" # tmp debug; TODO remove later
     else:
         # msg += f"- Rain: {max(rains)} / {min(rains)} // {avg_rain} mm\n"
         msg += f"- Max rain: {max(rains)} mm\n"
         msg += f"- Avg rain: {round(avg_rain)} mm\n"
-    msg += f"- Clouds: {round(avg_clouds)}\n\n"
 
-    msg += f"- Wind: {round(max(winds))} - {round(min(winds))} m/s\n"
-    msg += f"- Gust: {round(max(gusts))} - {round(min(gusts))} m/s\n"
+    ### WIND:
+    msg += f"- Wind: {round(min(winds))} - {round(max(winds))} m/s\n"
+    msg += f"- Gust: {round(min(gusts))} - {round(max(gusts))} m/s\n"
 
     return msg

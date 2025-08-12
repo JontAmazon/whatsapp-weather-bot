@@ -6,26 +6,32 @@ Sends today's weather at 08:30 and tomorrow's forecast at 18:00 using GitHub Act
 ## Example WhatsApp message
 Weather tomorrow:
 - Clouds / Clear
-- Sun: 6h
 - 21° / 16°
 - No rain
 - Clouds: 40.6
-- Wind: 5 - 3 m/s
-- Gust: 6 - 4 m/s
+- Wind: 3 - 5 m/s
+- Gust: 4 - 6 m/s
 
-## Environment Variables
-The following environment variables must be set for the app to work:
+# Environment Variables
+The following environment variables must be set:
 
-### Twilio
-- `TWILIO_ACCOUNT_SID` – Your Twilio Account SID
-- `TWILIO_AUTH_TOKEN` – Your Twilio Auth Token
-- `WHATSAPP_FROM` – Your Twilio WhatsApp sender number (e.g., `whatsapp:+123456789`)
-- `WHATSAPP_TO` – The recipient WhatsApp number (e.g., `whatsapp:+987654321`)
+## GitHub Actions secrets:
+- `FLY_API_TOKEN`
+- `FLY_APP_NAME`
+- `MACHINE_ID`
 
-### Weather API
+## Fly.io secrets:
+- `FLY_API_TOKEN`
+- `FLY_APP_NAME`
+- `MACHINE_ID`
+- `IS_FLY_MACHINE` – true
+
+- `TWILIO_ACCOUNT_SID`
+- `TWILIO_AUTH_TOKEN`
+- `WHATSAPP_FROM` – Your Twilio WhatsApp sender number
+- `WHATSAPP_TO`
+
+- `LAT`
+- `LON`
 - `WEATHER_API_KEY` – Your OpenWeatherMap API key
-- `LAT` – Latitude of the location
-- `LON` – Longitude of the location
-
-
-
+- `TOMORROW` – true/false. Get weather forecast for today or tomorrow. Value is set via GitHub Actions.
