@@ -1,20 +1,28 @@
 """
 weather_bot.py
 
-A WhatsApp weather bot that sends daily weather
-to a specified phone number updates using Twilio.
+A WhatsApp weather bot that sends weather forecasts
+to all subscribed phone numbers using Twilio.
 
-- Sends today's or tomorrow's weather forecast (argument).
-- Retrieves and formats weather data including
-  temperature, sun hours, wind, rain, and cloudiness.
+Important:
+ - Configure DB_PATH env var to point at the SQLite file (same path used by Flask app).
+ - If running in GitHub Actions, ensure the job has access to the DB file (or you can expose
+   an API endpoint to fetch subscribers instead). # NOTE: va???
+"""
+# Future improvements:
+"""
+- message based on preferences?
+- hourly cron jobs, and handle time zones?
 """
 
 import os
 import time
 import json
 from dotenv import load_dotenv
+from typing import Dict, Any
 from twilio.rest import Client
 from fetch_weather import fetch_weather
+from db import get_all_subscribers
 
 # Load environment variables
 load_dotenv()
@@ -26,6 +34,7 @@ whatsapp_from = os.getenv("WHATSAPP_FROM")
 # whatsapp_to = os.getenv("WHATSAPP_TO")
 twilio_client = Client(account_sid, auth_token)
 
+DB_PATH = os.environ.get("DB_PATH", "/data/subscribers.db")
 
 def send_weather_message(whatsapp_to: str, weather_forecast: str):
     try:
@@ -54,36 +63,40 @@ def send_weather_message(whatsapp_to: str, weather_forecast: str):
 
 
 if __name__ == "__main__":
-    
+    print("weather_bot starting — reading subscribers from DB:", DB_PATH)
+    subscribers = get_all_subscribers(DB_PATH)
+    print(f"Found {len(subscribers)} subscribers.")
+
     # tmp solution: load subscribers from JSON file
-    with open('database/tmp-json/subscribers.json', 'r') as f:
-        subscribers = json.load(f)
+    #with open('database/tmp-json/subscribers.json', 'r') as f:
+    #    subscribers = json.load(f)
 
-        counter = 0
-        for subscriber in subscribers:
+    counter = 0
+    for subscriber in subscribers:
+        # TODO: consider continuing if subscriber X gets an error.
 
-            # if counter >= 1:  # for testing, only send to one subscriber
-            #     break
+        # if counter >= 1:  # NOTE: for testing, only send to one subscriber
+        #     break
 
-            whatsapp_to = subscriber['phone_number']
-            location = subscriber['location']
-            lon = subscriber['lon']
-            lat = subscriber['lat']
-            tomorrow = True
-                # TODO later: here's a way how to get "TOMORROW":
-                # - cron job every hour
-                # - check both "send_time_morning" and "send_time_evening", and sets
-                # `TOMORROW` according to which one the current time matches with.
-            forecast_days = subscriber.get('forecast_days', 1)
-            
-            # Fetch weather data
-            try:
-                weather_forecast = fetch_weather(location, lon, lat, tomorrow, forecast_days)
-            except Exception as e:
-                print(f"[ERROR] Exception in fetch_weather, for {subscriber=}\n{e}")
-                raise
+        whatsapp_to = subscriber['phone_number']
+        location = subscriber['location']
+        lon = subscriber['lon']
+        lat = subscriber['lat']
+        tomorrow = True
+            # TODO later: here's a way how to get "TOMORROW":
+            # - cron job every hour
+            # - check both "send_time_morning" and "send_time_evening", and sets
+            # `TOMORROW` according to which one the current time matches with.
+        forecast_days = subscriber.get('forecast_days', 1)
+        
+        # Fetch weather data
+        try:
+            weather_forecast = fetch_weather(location, lon, lat, tomorrow, forecast_days)
+        except Exception as e:
+            print(f"[ERROR] Exception in fetch_weather, for {subscriber=}\n{e}")
+            raise
 
-            # Send WhatsApp message
-            send_weather_message(whatsapp_to, weather_forecast)
+        # Send WhatsApp message
+        send_weather_message(whatsapp_to, weather_forecast)
 
-            counter = counter + 1
+        counter = counter + 1

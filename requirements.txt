@@ -2,3 +2,5 @@ python-dotenv
 requests
 twilio
 schedule
+Flask>=2.2
+gunicorn>=20.1.0

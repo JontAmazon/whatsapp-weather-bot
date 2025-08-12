@@ -3,20 +3,39 @@
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = 'weather-whatsapp-bot'
-primary_region = 'arn'
+app = "weather-whatsapp-bot"
+primary_region = "arn"
 
+[mounts]
+  source = "data"
+  destination = "/data"
+  
 [build]
+
+cmd = "gunicorn -b 0.0.0.0:8080 app:app --workers 2 --threads 4"
 
 [http_service]
   internal_port = 8080
   force_https = true
-  auto_stop_machines = 'stop'
+  auto_stop_machines = "stop"
   auto_start_machines = true
-  min_machines_running = 0
-  processes = ['app']
+  min_machines_running = 1
 
 [[vm]]
-  memory = '1gb'
-  cpu_kind = 'shared'
+  memory = "1gb"
+  cpu_kind = "shared"
   cpus = 1
+
+[job.weather-bot]
+cmd = "python weather_bot.py"
+
+
+
+
+### Explanation ###
+# When you deploy with "fly deploy":
+# The app runs as a long-lived web server (Gunicorn + Flask) listening on port 8080.
+# Fly knows it’s a web app because of [http_service] and will route HTTP traffic there.
+
+# When you run "fly job run weather-bot" (or schedule it in Fly’s UI or with GitHub Actions):
+# Fly spins up a one-off job container that runs your python weather_bot.py script once, then exits.

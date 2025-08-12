@@ -2,6 +2,7 @@ A WhatsApp weather bot that sends daily weather updates using Twilio.
 
 Sends today's weather at 08:30 and tomorrow's forecast at 18:00 using GitHub Actions cron jobs that run weather_bot.py on a Fly.io machine.
 
+- subscribe at URL: xxx
 
 ## Example WhatsApp message
 Weather tomorrow:
@@ -12,26 +13,13 @@ Weather tomorrow:
 - Wind: 3 - 5 m/s
 - Gust: 4 - 6 m/s
 
-# Environment Variables
-The following environment variables must be set:
+# -----------------------------------------
 
-## GitHub Actions secrets:
-- `FLY_API_TOKEN`
-- `FLY_APP_NAME`
-- `MACHINE_ID`
+## (Some environmental variables must be set, e.g.:)
+- (todo-later: list)
 
-## Fly.io secrets:
-- `FLY_API_TOKEN`
-- `FLY_APP_NAME`
-- `MACHINE_ID`
-- `IS_FLY_MACHINE` – true
+## How to run locally:
+1. python app.py -> go to http://127.0.0.1:8080/ and subscribe
+2. python weather_bot.py -> it sends messages to all numbers 
 
-- `TWILIO_ACCOUNT_SID`
-- `TWILIO_AUTH_TOKEN`
-- `WHATSAPP_FROM` – Your Twilio WhatsApp sender number
-- `WHATSAPP_TO`
 
-- `LAT`
-- `LON`
-- `WEATHER_API_KEY` – Your OpenWeatherMap API key
-- `TOMORROW` – true/false. Get weather forecast for today or tomorrow. Value is set via GitHub Actions.
