@@ -1,4 +1,4 @@
-name: Delete Database Contents
+name: Print all subscribers
 
 on:
   workflow_dispatch:
@@ -9,7 +9,7 @@ jobs:
     steps:
       - name: Set up flyctl
         uses: superfly/flyctl-actions/setup-flyctl@master
-      - name: SSH and run delete_database_contents.py
+      - name: SSH and run print_all_subs.py
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
         run: |
@@ -17,4 +17,4 @@ jobs:
           sleep 10
           flyctl machine start ${{ secrets.MACHINE_ID }}
           sleep 20
-          flyctl ssh console -a weather-whatsapp-bot --command "python db/delete_database_all_contents.py"
+          flyctl ssh console -a weather-whatsapp-bot --command "python db/print_all_subs.py"
