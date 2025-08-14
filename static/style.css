@@ -30,3 +30,37 @@ button { background: #0b66ff; color:#fff; padding:10px 14px; border: none; borde
 .flash { padding:8px; border-radius:6px; margin-bottom:8px;}
 .flash.danger { background:#ffecec; color:#990000; border:1px solid #ffcccc; }
 footer { margin-top:20px; color:#666; font-size:0.9rem; }
+
+.info {
+  padding: 8px 12px;     /* Reduced padding */
+  margin-bottom: 14px;
+  border-radius: 6px;
+  font-size: 0.85rem;    /* Smaller text */
+  line-height: 1.4;
+}
+
+.info-forecast {
+  background: #fff4e5;
+  border-left: 4px solid #ff00f24f;
+  max-width: 90%;        /* Slightly narrower than main container */
+}
+
+.info-notes {
+  background: #f0f4ff;
+  border-left: 4px solid #0ba6ffbd;
+}
+
+.info ul {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.info li {
+  margin-bottom: 3px;
+}
+
+.info li ul {
+  margin-top: 2px;
+  padding-left: 16px;
+  list-style-type: disc;
+}
