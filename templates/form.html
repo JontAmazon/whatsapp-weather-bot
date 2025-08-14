@@ -76,12 +76,14 @@
       <input name="forecast_days" type="number" min="1" max="7" value="{{ form.forecast_days if form else '1' }}" />
       -->
 
-      <div class="checkboxes">
-        <label><input type="checkbox" name="wind" {% if form and form.wind %}checked{% endif %}/> Include wind</label>
-        <label><input type="checkbox" name="gust" {% if form and form.gust %}checked{% endif %}/> Include gusts</label>
-        <label><input type="checkbox" name="gif" {% if form and form.gif %}checked{% endif %}/> Include GIF (if available)</label>
-        <!-- <label><input type="checkbox" name="only_weird_weather" {% if form and form.only_weird_weather %}checked{% endif %}/> Only send forecast when weather is weird</label> -->
-      </div>
+      <!--
+        <div class="checkboxes">
+          <label><input type="checkbox" name="wind" {% if form and form.wind %}checked{% endif %}/> Include wind</label>
+          <label><input type="checkbox" name="gust" {% if form and form.gust %}checked{% endif %}/> Include gusts</label>
+          <label><input type="checkbox" name="gif" {% if form and form.gif %}checked{% endif %}/> Include GIF (if available)</label>
+          <label><input type="checkbox" name="only_weird_weather" {% if form and form.only_weird_weather %}checked{% endif %}/> Only send forecast when weather is weird</label>
+        </div>
+      -->
 
       <div class="actions">
         <button type="submit">Subscribe</button>

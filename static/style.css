@@ -41,13 +41,13 @@ footer { margin-top:20px; color:#666; font-size:0.9rem; }
 
 .info-forecast {
   background: #fff4e5;
-  border-left: 4px solid #ff00f24f;
+  border-left: 4px solid #ffe60071;
   max-width: 90%;        /* Slightly narrower than main container */
 }
 
 .info-notes {
   background: #f0f4ff;
-  border-left: 4px solid #0ba6ffbd;
+  border-left: 4px solid #0ba6ff70;
 }
 
 .info ul {
