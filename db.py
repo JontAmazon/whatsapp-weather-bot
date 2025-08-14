@@ -137,6 +137,8 @@ def add_or_update_subscriber(db_path: str, data: Dict[str, Any]) -> Dict[str, An
     if not phone:
         raise ValueError("phone_number is required")
     existing = get_subscriber_by_phone(db_path, phone)
+    
+    # existing = False  # tmp test
     if existing:
         updated = update_subscribers_by_phone(db_path, phone, data)
         return {"action": "updated", "rows": updated}
