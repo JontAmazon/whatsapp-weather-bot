@@ -84,22 +84,22 @@ def subscribe():
     # Normalize inputs
     phone_raw = form.get("phone_number", "").strip()
     # phone = phone_raw.replace("whatsapp:", "").strip()
-    phone_nbr = "whatsapp:" + phone_raw
+    phone_nbr = "whatsapp:" + phone_raw  # e.g. "whatsapp:+46761234567"
 
 
     data = {
         "phone_number": phone_nbr,
-        "location": form.get("location", "").strip(),
-        "lon": float(form.get("lon")) if form.get("lon") else None,
-        "lat": float(form.get("lat")) if form.get("lat") else None,
-        "channel": form.get("channel", "whatsapp"),
-        "send_time_morning": form.get("send_time_morning") or None,
-        "send_time_afternoon": form.get("send_time_afternoon") or None,
+        "location": form.get("location").strip(),
+        "lon": float(form.get("lon")),
+        "lat": float(form.get("lat")),
+        "channel": form.get("channel", "whatsapp"),                     # not implemented yet
+        "send_time_morning": form.get("send_time_morning") or None,     # not implemented yet
+        "send_time_afternoon": form.get("send_time_afternoon") or None, # not implemented yet
         "wind": parse_bool(form.get("wind", "")),
         "gust": parse_bool(form.get("gust", "")),
-        "gif": parse_bool(form.get("gif", "")),
-        "forecast_days": int(form.get("forecast_days", "1")),
-        "only_weird_weather": parse_bool(form.get("only_weird_weather", "")),
+        "gif": parse_bool(form.get("gif", "")),                         # not implemented yet
+        "forecast_days": int(form.get("forecast_days", "1")),           # not implemented yet
+        "only_weird_weather": parse_bool(form.get("only_weird_weather", "")), # not implemented yet
     }
 
     # Insert or update subscriber(s) with same phone number
@@ -112,5 +112,7 @@ def thank_you():
     return render_template("thank_you.html")
 
 if __name__ == "__main__":
-    # debug server for local testing
+    # NOTE: this code is only run when running app.py locally. Keep for local testing.
+    # On Fly, I'm running Gunicorn (CMD ["gunicorn", "-b", "0.0.0.0:8080", "app:app", etc.])
+    print("Starting Flask server...")
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 8080)), debug=True)

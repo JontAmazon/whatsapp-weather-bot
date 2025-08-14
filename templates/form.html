@@ -24,8 +24,8 @@
       <label>Phone number</label>
       <input name="phone_number" type="text" required value="{{ form.phone_number if form else '' }}" placeholder="+4676..." />
 
-      <label>Location (name)</label>
-      <input name="location" type="text" required value="{{ form.location if form else '' }}" placeholder="Valencia" />
+      <label>Location name</label>
+      <input name="location" type="text" required value="{{ form.location if form else '' }}" placeholder="Lund" />
 
       <label>Longitude (optional)</label>
       <input name="lon" type="text" value="{{ form.lon if form else '' }}" placeholder="0.3756" />
@@ -33,24 +33,30 @@
       <label>Latitude (optional)</label>
       <input name="lat" type="text" value="{{ form.lat if form else '' }}" placeholder="39.4738" />
 
+      <!-- 
       <label>Send time — Morning (HH:MM)</label>
       <input name="send_time_morning" type="text" value="{{ form.send_time_morning if form else '' }}" placeholder="07:00" />
+      -->
 
+      <!-- 
       <label>Send time — Afternoon (HH:MM)</label>
       <input name="send_time_afternoon" type="text" value="{{ form.send_time_afternoon if form else '' }}" placeholder="18:00" />
+      -->
 
-      <label>Forecast days</label>
+      <!-- 
+      label>Forecast days</label>
       <input name="forecast_days" type="number" min="1" max="7" value="{{ form.forecast_days if form else '1' }}" />
+      -->
 
       <div class="checkboxes">
         <label><input type="checkbox" name="wind" {% if form and form.wind %}checked{% endif %}/> Include wind</label>
         <label><input type="checkbox" name="gust" {% if form and form.gust %}checked{% endif %}/> Include gusts</label>
         <label><input type="checkbox" name="gif" {% if form and form.gif %}checked{% endif %}/> Include GIF (if available)</label>
-        <label><input type="checkbox" name="only_weird_weather" {% if form and form.only_weird_weather %}checked{% endif %}/> Only send when weird weather</label>
+        <!-- <label><input type="checkbox" name="only_weird_weather" {% if form and form.only_weird_weather %}checked{% endif %}/> Only send forecast when weather is weird</label> -->
       </div>
 
       <div class="actions">
-        <button type="submit">Subscribe / Update</button>
+        <button type="submit">Subscribe</button>
       </div>
     </form>
 
