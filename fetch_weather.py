@@ -20,11 +20,10 @@ def fetch_weather(location, lon, lat, tomorrow: bool, forecast_days: int) -> str
     :param forecast_days: Not yet implemented...
 
     :return: Example string:
-        Weather tomorrow:
-        - Clouds / Clear
+        Lund tomorrow:
         - 21° / 16°
-        - No rain :)
         - Clouds: 40.6
+        - Rain: 0 mm / 3h
         - Wind: 3 - 5 m/s
         - Gust: 4 - 6 m/s
     """
@@ -137,14 +136,13 @@ def fetch_weather(location, lon, lat, tomorrow: bool, forecast_days: int) -> str
     # msg += f"- Sun: *{sun_hours}h*\n"
 
     # Rain:
-    if round(avg_rain) == 0:
-        msg += f"- No rain :)\n"
-        msg += f"- Max rain: {max(rains)} mm\n"      # tmp debug; TODO remove later
-        msg += f"- Avg rain: {round(avg_rain)} mm\n" # tmp debug; TODO remove later
-    else:
-        # msg += f"- Rain: {max(rains)} / {min(rains)} // {avg_rain} mm\n"
-        msg += f"- Max rain: {max(rains)} mm\n"
-        msg += f"- Avg rain: {round(avg_rain)} mm\n"
+    #if round(avg_rain) == 0:
+    #    msg += f"- No rain\n"
+    #else:
+    # msg += f"- Rain: {max(rains)} / {min(rains)} // {avg_rain} mm\n"
+    #msg += f"- Max rain: {max(rains)} mm\n"
+    #msg += f"- Avg rain: {round(avg_rain)} mm\n"
+    msg += f"- Rain: {avg_rain:.1f} mm / 3h\n"
 
     # Wind:
     msg += f"- Wind: {round(min(winds))} - {round(max(winds))} m/s\n"
