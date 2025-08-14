@@ -65,6 +65,7 @@ def fetch_weather(location, lon, lat, tomorrow: bool, forecast_days: int) -> str
     clouds = []
     weather_type = []
     weather_emoji = []
+    time_of_day = []  # e.g. 09:00, 12:00, etc.
 
     # Filter the data for the target date
     if tomorrow:
@@ -73,10 +74,10 @@ def fetch_weather(location, lon, lat, tomorrow: bool, forecast_days: int) -> str
         target_date = datetime.now().date()
 
     for item in data["list"]:
-        time = datetime.fromtimestamp(item["dt"])
-        if time.date() != target_date:
+        dt = datetime.fromtimestamp(item["dt"])
+        if dt.date() != target_date:
             continue
-        if time.time().hour < 7 or time.time().hour > 22:
+        if dt.time().hour < 7 or dt.time().hour > 22:
             # not such an interesting interval --> skip!
             continue
         temps.append(item["main"]["temp"])
@@ -85,14 +86,15 @@ def fetch_weather(location, lon, lat, tomorrow: bool, forecast_days: int) -> str
         gusts.append(item["wind"].get("gust", {0}))
         clouds.append(item["clouds"]["all"])
         weather_type.append(item["weather"][0]["main"])
+        time_of_day.append(dt.time())
 
     if not temps:
         return "No weather data available."
     
 
     # Translate into emojis
-    for weather_type_3h in weather_type:
-        print(f"{time.time()}: {weather_type_3h=}")
+    for weather_type_3h, hour_of_day in zip(weather_type, time_of_day):
+        print(f"{hour_of_day}: {weather_type_3h=}")
         if weather_type_3h == "Clouds":
             weather_emoji.append("☁️")
         elif weather_type_3h == "Clear":
