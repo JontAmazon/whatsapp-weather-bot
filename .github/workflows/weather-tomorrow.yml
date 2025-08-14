@@ -16,5 +16,7 @@ jobs:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
         run: |
           flyctl secrets set TOMORROW=true -a "${{ secrets.FLY_APP_NAME }}"
+          sleep 10
+          flyctl machine start ${{ secrets.MACHINE_ID }}
+          sleep 20
           flyctl ssh console -a weather-whatsapp-bot --command "python weather_bot.py"
-
