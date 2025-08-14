@@ -103,7 +103,11 @@ def subscribe():
     }
 
     # Insert or update subscriber(s) with same phone number
-    add_or_update_subscriber(DB_PATH, data)
+    try:
+        add_or_update_subscriber(DB_PATH, data)
+    except Exception as e:
+        flash(f"Failed to subscribe: {e}", "danger")
+        return redirect(url_for("form"))
 
     return redirect(url_for("thank_you"))
 
