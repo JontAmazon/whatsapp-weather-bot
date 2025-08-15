@@ -40,8 +40,8 @@ footer { margin-top:20px; color:#666; font-size:0.9rem; }
 }
 
 .info-forecast {
-  background: #fff4e5;
-  border-left: 4px solid #ffe60071;
+  background: #b4ffda98;
+  border-left: 4px solid #00ff6a71;
   max-width: 90%;        /* Slightly narrower than main container */
 }
 

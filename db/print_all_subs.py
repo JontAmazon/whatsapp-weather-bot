@@ -1,4 +1,10 @@
+import sys
 import os
+
+# Add project root to sys.path
+# Needed for GH Actions to find the db module
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 from db import get_all_subscribers
 
 DB_PATH = os.environ.get("DB_PATH", "/data/subscribers.db")  # Fly volume default

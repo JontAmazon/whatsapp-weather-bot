@@ -27,7 +27,7 @@ def fetch_weather(location, lon, lat, tomorrow: bool, forecast_days: int) -> str
         - Wind: 3 - 5 m/s
         - Gust: 4 - 6 m/s
     """
-
+    # ----------- Fetch the weather data from weather_url ----------------
     params = {
         "lat": lat,
         "lon": lon,
@@ -49,12 +49,13 @@ def fetch_weather(location, lon, lat, tomorrow: bool, forecast_days: int) -> str
     except requests.exceptions.RequestException as err:
         print(f"Request failed: {err}")
     else:
-        print(f"[DEBUG] Response headers: {response.headers}") # tmp
-        print(f"[DEBUG] First 500 chars of body: {response.text[:500]}") # tmp 
+        # print(f"[DEBUG] Weather API response headers: {response.headers}")
+        print(f"[DEBUG] First 150 chars of body: {response.text[:150]}") 
 
         data = response.json()
         # print(f"\n\n{data=}\n\n")
 
+    # --------------- Build the weather message ----------------
     # Define variables
     # sun_hours = 0; # if weather_type_3h == "Clear": sun_hours += 3
     temps = []
@@ -103,6 +104,7 @@ def fetch_weather(location, lon, lat, tomorrow: bool, forecast_days: int) -> str
 
     avg_clouds = sum(clouds) / len(clouds)
     avg_rain = sum(rains) / len(rains) if rains else 0
+    avg_rain_per_hour = avg_rain / 3
     avg_wind = sum(winds) / len(winds)
 
     ### ------------- Format the message ----------------
@@ -132,21 +134,19 @@ def fetch_weather(location, lon, lat, tomorrow: bool, forecast_days: int) -> str
     
     # Temperature:
     msg += f"- {round(max(temps))}° / {round(min(temps))}°\n"
-    msg += f"- Clouds: {round(avg_clouds)}\n\n"
+    msg += f"- Clouds: {round(avg_clouds)}\n"
     # msg += f"- Sun: *{sun_hours}h*\n"
 
     # Rain:
-    #if round(avg_rain) == 0:
-    #    msg += f"- No rain\n"
-    #else:
-    # msg += f"- Rain: {max(rains)} / {min(rains)} // {avg_rain} mm\n"
-    #msg += f"- Max rain: {max(rains)} mm\n"
-    #msg += f"- Avg rain: {round(avg_rain)} mm\n"
-    msg += f"- Rain: {avg_rain:.1f} mm / 3h\n"
+    if avg_rain_per_hour < 0.1:
+        msg += f"- No rain\n"
+    else:
+        msg += f"- Rain: {avg_rain_per_hour:.2f} mm/h\n"
 
     # Wind:
-    msg += f"- Wind: {round(min(winds))} - {round(max(winds))} m/s\n"
-    msg += f"- Gust: {round(min(gusts))} - {round(max(gusts))} m/s\n"
+    # I don't know if this is interesting enough...
+    # msg += f"- Wind: {round(min(winds))} - {round(max(winds))} m/s\n"
+    # msg += f"- Gusts: {round(min(gusts))} - {round(max(gusts))} m/s\n"
 
 
     if not msg:

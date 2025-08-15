@@ -16,10 +16,9 @@ RECIPIENTS.append(os.getenv("WHATSAPP_TO"))  # my phone number
 # Fetch all subscribers from DB, then filter by RECIPIENTS
 all_subs = get_all_subscribers(DB_PATH)
 recipients = [sub for sub in all_subs if sub['phone_number'] in RECIPIENTS]
-print(f"{recipients=}")
+print(*recipients, sep="\n")
 
 if not recipients:
     print(f"No subscribers found that had matching phone number with any number in {RECIPIENTS=}.")
 else:
-    for sub in recipients:
-        send_to_subscribers(recipients)
+    send_to_subscribers(recipients)

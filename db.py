@@ -32,14 +32,13 @@ def get_conn(db_path: str) -> sqlite3.Connection:
 def init_db(db_path: str):
     """Create database and table if not exists"""
 
-    for _ in range(3):
-        print()
+    print()
     for _ in range(3):
         print(f"Initializing database at {db_path}...")
 
-    print("Checking /data...")
-    print("Exists:", os.path.exists("/data"))
-    print("Contents:", os.listdir("/data"))
+    print("[DEBUG] Checking /data...")
+    print("[DEBUG] Exists:", os.path.exists("/data"))
+    print("[DEBUG] Contents:", os.listdir("/data"))
     os.chmod("/data", 0o777)  # shouldn't be necessary
 
     try:
