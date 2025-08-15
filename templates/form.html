@@ -21,21 +21,18 @@
     <div class="info info-notes">
       <p><strong>Notes / current limitations:</strong></p>
       <ul>
-        <li>Reply "stop" to unsubscribe.
+        <li>Reply "stop" to unsubscribe. (Or actually, don't!)
           <ul>
-            <li>But re-subscribe is not implemented yet, so don’t "test" this, only reply "stop" if you actually want to unsubscribe.</li>
+            <li>Re-subscribe is not implemented yet, so don’t "test" sending "stop", only reply "stop" if you actually want to unsubscribe.</li>
           </ul>
         </li>
         <li>You can update your subscription details (e.g. location or preferences) by re-subscribing with the same number.</li>
-        <li>Current limitations:
+        <li>Current limitations due to using Twilio's "Sandbox" for WhatsApp:
           <ul>
-            <li>Still using Twilio "Sandbox", meaning:</li>
             <li>After clicking "subscribe", you need to send a WhatsApp message to +14155238886 with the text "join thee-small".</li>
             <li>To keep receiving daily messages, you need to send "join thee-small" at least every 24 hours.</li>
-            <li>(The sandbox limits total messages per day, but I’ve only hit the limit once.)</li>
           </ul>
         </li>
-        <li>Please don't try any "funny stuff", like overflow, or SQL/JavaScript injection...</li>
       </ul>
     </div>
 
@@ -49,19 +46,18 @@
       {% endif %}
     {% endwith %}
 
-
     <form action="{{ url_for('subscribe') }}" method="post" class="form">
       <label>Phone number</label>
-      <input name="phone_number" type="text" required value="{{ form.phone_number if form else '' }}" placeholder="+4676..." />
+      <input name="phone_number" type="text" required maxlength="15" value="{{ form.phone_number if form else '' }}" placeholder="+4676..." />
 
       <label>Location name</label>
-      <input name="location" type="text" required value="{{ form.location if form else '' }}" placeholder="Lund" />
+      <input name="location" type="text" required maxlength="20" value="{{ form.location if form else '' }}" placeholder="Lund" />
 
       <label>Longitude</label>
-      <input name="lon" type="text" required value="{{ form.lon if form else '' }}" placeholder="13.1910" />
+      <input name="lon" type="text" required maxlength="10" value="{{ form.lon if form else '' }}" placeholder="13.1910" />
 
       <label>Latitude</label>
-      <input name="lat" type="text" required value="{{ form.lat if form else '' }}" placeholder="55.7047" />
+      <input name="lat" type="text" required maxlength="10" value="{{ form.lat if form else '' }}" placeholder="55.7047" />
 
       <!-- 
       <label>Send time — Morning (HH:MM)</label>

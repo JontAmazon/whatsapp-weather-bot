@@ -3,6 +3,8 @@ import os
 import sqlite3
 from typing import Optional, Dict, Any, List
 
+MAX_SUBSCRIBERS = 150
+
 CREATE_TABLE_SQL = """
 CREATE TABLE IF NOT EXISTS subscribers (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -36,10 +38,9 @@ def init_db(db_path: str):
     for _ in range(3):
         print(f"Initializing database at {db_path}...")
 
-    print("[DEBUG] Checking /data...")
-    print("[DEBUG] Exists:", os.path.exists("/data"))
-    print("[DEBUG] Contents:", os.listdir("/data"))
-    os.chmod("/data", 0o777)  # shouldn't be necessary
+    #print("[DEBUG] Checking /data...")                # or /db, locally
+    #print("[DEBUG] Exists:", os.path.exists("/data")) # or /db, locally
+    #print("[DEBUG] Contents:", os.listdir("/data"))   # or /db, locally
 
     try:
         conn = get_conn(db_path)
@@ -127,20 +128,21 @@ def get_all_subscribers(db_path: str) -> List[Dict[str, Any]]:
     return [row_to_dict(r) for r in rows]
 
 def add_or_update_subscriber(db_path: str, data: Dict[str, Any]) -> Dict[str, Any]:
-    """
-    If any subscriber exists with same phone_number -> update all rows with that phone.
-    Otherwise insert a new row.
-    Returns a dict with result info.
-    """
     phone = data.get("phone_number")
     if not phone:
         raise ValueError("phone_number is required")
+
     existing = get_subscriber_by_phone(db_path, phone)
-    
-    # existing = False  # tmp test
     if existing:
         updated = update_subscribers_by_phone(db_path, phone, data)
         return {"action": "updated", "rows": updated}
-    else:
-        new_id = insert_subscriber(db_path, data)
-        return {"action": "inserted", "id": new_id}
+
+    # enforce total DB limit
+    conn = get_conn(db_path)
+    count = conn.execute("SELECT COUNT(*) FROM subscribers").fetchone()[0]
+    conn.close()
+    if count >= MAX_SUBSCRIBERS:
+        raise ValueError("Subscriber limit reached")
+
+    new_id = insert_subscriber(db_path, data)
+    return {"action": "inserted", "id": new_id}
