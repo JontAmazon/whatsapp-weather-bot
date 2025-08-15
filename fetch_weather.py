@@ -134,7 +134,7 @@ def fetch_weather(location, lon, lat, tomorrow: bool, forecast_days: int) -> str
     
     # Temperature:
     msg += f"- {round(max(temps))}° / {round(min(temps))}°\n"
-    msg += f"- Clouds: {round(avg_clouds)}\n"
+    msg += f"- Clouds: {round(avg_clouds)}%\n"
     # msg += f"- Sun: *{sun_hours}h*\n"
 
     # Rain:

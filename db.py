@@ -33,11 +33,7 @@ def get_conn(db_path: str) -> sqlite3.Connection:
 
 def init_db(db_path: str):
     """Create database and table if not exists"""
-
-    print()
-    for _ in range(3):
-        print(f"Initializing database at {db_path}...")
-
+    print(f"Initializing database at {db_path}...")
     #print("[DEBUG] Checking /data...")                # or /db, locally
     #print("[DEBUG] Exists:", os.path.exists("/data")) # or /db, locally
     #print("[DEBUG] Contents:", os.listdir("/data"))   # or /db, locally

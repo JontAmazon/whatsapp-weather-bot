@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  delete-database-contents:
+  delete-database-contents-by-id:
     runs-on: ubuntu-latest
     steps:
       - name: Set up flyctl

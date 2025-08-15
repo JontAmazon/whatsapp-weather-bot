@@ -1,3 +1,6 @@
+""" To be run on Fly.io via GH Action "delete_database_all_contents.yml". """
+# Note to self: instead of GH action, I should make a script that uses SSH and does everything ^^
+    # See print_all_subs2.py (WIP)
 import sys
 import os
 

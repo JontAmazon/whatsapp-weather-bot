@@ -1,6 +1,5 @@
-A WhatsApp weather bot that sends daily weather updates using Twilio.
-
-Sends today's weather at 07:00 and tomorrow's forecast at 18:00 using GitHub Actions cron jobs that run weather_bot.py on a Fly.io machine.
+# WhatsApp Weather Bot
+Bot that sends daily weather messages using Twilio. Sends today's weather at 07:00 and tomorrow's forecast at 18:00 using GitHub Actions cron jobs that run weather_bot.py on a Fly.io machine.
 
 - subscribe for free via web form: https://weather-whatsapp-bot.fly.dev/
 
@@ -15,6 +14,11 @@ Lund tomorrow:
     - but I will change this, I hope !!!
 - currently limited to WhatsApp, no SMS (could easily be changed).
 - currently, all users are assumed to be near Central European Time. Texts are sent around 07:30 and 18:30 CET.
+
+## Features
+- *auto_stop_machines:* The Fly.io machine sleeps whenever it can, so I have ~0 costs. 🙂 
+The VM only wakes up when the someone browses the sign-up form website, or when GH Actions trigger the weather bot.
+
 
 # ---------- How to run locally ----------
 
