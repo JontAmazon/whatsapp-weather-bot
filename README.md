@@ -38,7 +38,7 @@ The VM only wakes up when the someone browses the sign-up form website, or when 
 
 
 ## Environmental variables
-- (todo-later: list)
+- (see list in EV-README)
 
 
 

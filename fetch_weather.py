@@ -27,7 +27,21 @@ def fetch_weather(location, lon, lat, tomorrow: bool, forecast_days: int) -> str
         - Wind: 3 - 5 m/s
         - Gust: 4 - 6 m/s
     """
-    # ----------- Fetch the weather data from weather_url ----------------
+    
+    # ---------------------------------------------------------
+    # NOTE: I slimmed down the message a lot. If one wants to, it could look like this:
+    """
+        Lund tomorrow:
+        - Clear / Broken clouds
+        - 21° / 16°
+        - Clouds: 40.6%
+        - Rain: 0 mm/h
+        - Wind: 3 - 5 m/s
+        - Gust: 4 - 6 m/s
+    """
+    # ---------------------------------------------------------
+
+    # ----------- 1. Fetch the weather data from weather_url ----------------
     params = {
         "lat": lat,
         "lon": lon,
@@ -55,15 +69,17 @@ def fetch_weather(location, lon, lat, tomorrow: bool, forecast_days: int) -> str
         data = response.json()
         # print(f"\n\n{data=}\n\n")
 
-    # --------------- Build the weather message ----------------
+    # --------------- 2. Build the weather message ----------------
     # Define variables
     # sun_hours = 0; # if weather_type_3h == "Clear": sun_hours += 3
     temps = []
+    feels_like = []
     winds = []
     gusts = []
     rains = []
     clouds = []
     weather_type = []
+    weather_description = []
     weather_emoji = []
     time_of_day = []  # e.g. 09:00, 12:00, etc.
 
@@ -77,40 +93,52 @@ def fetch_weather(location, lon, lat, tomorrow: bool, forecast_days: int) -> str
         dt = datetime.fromtimestamp(item["dt"])
         if dt.date() != target_date:
             continue
-        if dt.time().hour < 7 or dt.time().hour > 22:
-            # not such an interesting interval --> skip!
-            continue
+        
+        # 24 hours:
         temps.append(item["main"]["temp"])
+        feels_like.append(item["main"]["feels_like"])
         winds.append(item["wind"]["speed"])
-        rains.append(item.get("rain", {}).get("3h", 0))
         gusts.append(item["wind"].get("gust", {0}))
+        
+        if dt.time().hour < 7 or dt.time().hour > 22:
+            # not such an interesting interval for rain/clouds/weather type --> skip!
+            # NOTE: 7-22 gives us an interval from 7:00 to 01:00, since the weather data is 3h intervals.
+            continue
+        
+        # Between 7:00 - 01:00:
         clouds.append(item["clouds"]["all"])
+        rains.append(item.get("rain", {}).get("3h", 0))
         weather_type.append(item["weather"][0]["main"])
+        weather_description.append(item["weather"][0]["description"])
         time_of_day.append(dt.time())
 
     if not temps:
         return "No weather data available."
     
 
-    # Translate into emojis
-    for weather_type_3h, hour_of_day in zip(weather_type, time_of_day):
-        print(f"{hour_of_day}: {weather_type_3h=}")
-        if weather_type_3h == "Clouds":
+    # Translate "weather_type" into emojis
+    for hour_of_day, w_type_3h, w_descr_3h in zip(time_of_day, weather_type, weather_description):
+        print(f"{hour_of_day}: {w_type_3h=}, {w_descr_3h=}")
+        if w_type_3h == "Clouds":
             weather_emoji.append("☁️")
-        elif weather_type_3h == "Clear":
+        elif w_type_3h == "Clear":
             weather_emoji.append("☀️")
-        elif weather_type_3h == "Rain":
+        elif w_type_3h == "Rain":
             weather_emoji.append("🌧")
 
-    avg_clouds = sum(clouds) / len(clouds)
+    # maybe TODO:
+    # Translate "weather_description" into emojis
+    # ...
+
+    # Calculate averages
+    avg_clouds = sum(clouds) / len(clouds) if clouds else "no data"
+    avg_wind = sum(winds) / len(winds) if winds else "no data"
     avg_rain = sum(rains) / len(rains) if rains else 0
     avg_rain_per_hour = avg_rain / 3
-    avg_wind = sum(winds) / len(winds)
 
     ### ------------- Format the message ----------------
     which_day = "tomorrow" if tomorrow else "today"
     msg = f"🌤 {location} {which_day}:\n"
-    # msg = f"{location} {which_day}:\n"  # use this one when emojis work?
     
     """ # message += weather emojis
     for emoji in weather_emoji:
@@ -133,9 +161,12 @@ def fetch_weather(location, lon, lat, tomorrow: bool, forecast_days: int) -> str
     """
     
     # Temperature:
-    msg += f"- {round(max(temps))}° / {round(min(temps))}°\n"
-    msg += f"- Clouds: {round(avg_clouds)}%\n"
+    # msg += f"- {round(max(temps))}° / {round(min(temps))}°\n"
+    msg += f"- {round(max(feels_like))}° / {round(min(feels_like))}°\n"
     # msg += f"- Sun: *{sun_hours}h*\n"
+    
+    # Clouds:
+    # msg += f"- Clouds: {round(avg_clouds)}%\n"
 
     # Rain:
     if avg_rain_per_hour < 0.1:
