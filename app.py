@@ -151,6 +151,26 @@ def thank_you():
     check_rate_limit()
     return render_template("thank_you.html")
 
+
+def handle_unsubscribe_request(phone_number):
+    print(f"Time to bring in Maria...")
+    # ... logic here ...
+
+@app.route("/whatsapp", methods=["POST"])
+def whatsapp_webhook():
+    """ When a user sends a message to the bot via WhatsApp, it gets forwarded to this endpoint."""
+    # Twilio webhook setup, i.e. the following sandbox configuration:
+    # When a message comes in: https://weather-whatsapp-bot.fly.dev/whatsapp
+    print("Twilio webhook - a user sent a message")
+    from_number = request.form.get("From")
+    body = request.form.get("Body", "").strip().lower()
+    print(f"{from_number=}:")
+    print(body)
+    if body == "I want to unsubscribe":
+        handle_unsubscribe_request(from_number)
+        return "So... you think can you dance?", 200
+    return "Message received", 200
+
 if __name__ == "__main__":
     # NOTE: this code is only run when running app.py locally. Keep for local testing.
     # On Fly, I'm running Gunicorn (CMD ["gunicorn", "-b", "0.0.0.0:8080", "app:app", etc.])
