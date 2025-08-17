@@ -28,6 +28,5 @@ def send_weather_message(whatsapp_to: str, weather_forecast: str):
 
 def send_to_subscribers(subscribers):
     for sub in subscribers:
-        nbr_days = sub.get('forecast_days', 1)  # not implemented yet
-        forecast = fetch_weather(sub['location'], sub['lon'], sub['lat'], TOMORROW, nbr_days)
+        forecast = fetch_weather(sub['location'], sub['lon'], sub['lat'], TOMORROW)
         send_weather_message(sub['phone_number'], forecast)

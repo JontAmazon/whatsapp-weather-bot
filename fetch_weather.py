@@ -11,44 +11,23 @@ from collections import Counter
 load_dotenv()
 weather_api_key = os.getenv("WEATHER_API_KEY")
 weather_url = "https://api.openweathermap.org/data/2.5/forecast"
+    # NOTE: this API gives data in 3 hour intervals for the next 5 days.
 
 
-def fetch_weather(location, lon, lat, tomorrow: bool, forecast_days: int) -> str:
-    """ Fetch weather data from api.openweathermap.org and format it nicely.
-    
-    :param tomorrow: Boolean. If True, fetch weather for tomorrow, otherwise for today.
-    :param forecast_days: Not yet implemented...
+def fetch_weather(location: str, lon: str, lat: str, tomorrow: bool) -> str:
+    data = get_weather_data(lon, lat)
+    if data == "error fetching weather data":
+        return
+    return format_weather(data, location, tomorrow)
 
-    :return: Example string:
-        Lund tomorrow:
-        - 21° / 16°
-        - Clouds: 40.6
-        - Rain: 0 mm / 3h
-        - Wind: 3 - 5 m/s
-        - Gust: 4 - 6 m/s
-    """
-    
-    # ---------------------------------------------------------
-    # NOTE: I slimmed down the message a lot. If one wants to, it could look like this:
-    """
-        Lund tomorrow:
-        - Clear / Broken clouds
-        - 21° / 16°
-        - Clouds: 40.6%
-        - Rain: 0 mm/h
-        - Wind: 3 - 5 m/s
-        - Gust: 4 - 6 m/s
-    """
-    # ---------------------------------------------------------
-
-    # ----------- 1. Fetch the weather data from weather_url ----------------
+def get_weather_data(lon, lat):
+    """ Fetch raw weather data from the API. Returns the raw response (dict or JSON). """
     params = {
         "lat": lat,
         "lon": lon,
         "appid": weather_api_key,
         "units": "metric"
     }
-
     try:
         response = requests.get(weather_url, params=params)
         response.raise_for_status()  # Raises HTTPError for 4xx/5xx responses
@@ -60,18 +39,37 @@ def fetch_weather(location, lon, lat, tomorrow: bool, forecast_days: int) -> str
             print(f"Server error: {status} - {response.text}")
         else:
             print(f"Unexpected HTTP error: {http_err}")
+        return "error fetching weather data"
     except requests.exceptions.RequestException as err:
         print(f"Request failed: {err}")
-    else:
-        # print(f"[DEBUG] Weather API response headers: {response.headers}")
-        print(f"[DEBUG] First 150 chars of body: {response.text[:150]}") 
+        return "error fetching weather data"
+    
+    # print(f"[DEBUG] Weather API response headers: {response.headers}")
+    print(f"[DEBUG] First 150 chars of body: {response.text[:150]}") 
+    data = response.json()
+    # print(f"\n\n{data=}\n\n")
+    return data
+    
+def format_weather(data, location: str, tomorrow: bool) -> str:
+    """
+    Format raw weather data into a message string.
 
-        data = response.json()
-        # print(f"\n\n{data=}\n\n")
-
-    # --------------- 2. Build the weather message ----------------
-    # Define variables
-    # sun_hours = 0; # if weather_type_3h == "Clear": sun_hours += 3
+    :param tomorrow: Boolean. If True, fetch weather for tomorrow, otherwise for today.
+    :return: Example string:
+        Lund tomorrow:
+        - 21° / 16°
+        - Light breeze
+        - Maybe some rain
+    """
+    # ---------------------------------------------------------
+    # NOTE: possible additions to the message:
+    """
+        - Clear / Broken clouds
+        - Clouds: 40.6%
+        - Gust: 4 - 6 m/s
+        - sun hours?
+    """
+    # ---------------------------------------------------------
     temps = []
     feels_like = []
     winds = []
@@ -80,10 +78,8 @@ def fetch_weather(location, lon, lat, tomorrow: bool, forecast_days: int) -> str
     clouds = []
     weather_type = []
     weather_description = []
-    weather_emoji = []
     time_of_day = []  # e.g. 09:00, 12:00, etc.
 
-    # Filter the data for the target date
     if tomorrow:
         target_date = (datetime.now() + timedelta(days=1)).date()
     else:
@@ -116,20 +112,9 @@ def fetch_weather(location, lon, lat, tomorrow: bool, forecast_days: int) -> str
     if not temps:
         return "No weather data available."
     
-
-    # Translate "weather_type" into emojis
+    # [DEBUG] Print "weather_type"
     for hour_of_day, w_type_3h, w_descr_3h in zip(time_of_day, weather_type, weather_description):
         print(f"{hour_of_day}: {w_type_3h=}, {w_descr_3h=}")
-        if w_type_3h == "Clouds":
-            weather_emoji.append("☁️")
-        elif w_type_3h == "Clear":
-            weather_emoji.append("☀️")
-        elif w_type_3h == "Rain":
-            weather_emoji.append("🌧")
-
-    # maybe TODO:
-    # Translate "weather_description" into emojis
-    # ...
 
     # Calculate averages
     avg_clouds = sum(clouds) / len(clouds) if clouds else "no data"
@@ -141,45 +126,15 @@ def fetch_weather(location, lon, lat, tomorrow: bool, forecast_days: int) -> str
     which_day = "tomorrow" if tomorrow else "today"
     msg = f"🌤 {location} {which_day}:\n"
     
-    """ # message += weather emojis
-    for emoji in weather_emoji:
-        msg += emoji + " "
-    msg += "\n"
-    """
-    
-    """ # message += weather type in words
-    counts = Counter(weather_type)
-    most_common = counts.most_common(2)
-    most_common1 = most_common[0][0]
-    if len(most_common) > 1:
-        most_common2 = most_common[1][0]
-    else:
-        most_common2 = None
-    if most_common2:
-        msg += f"- {most_common1} / {most_common2}\n"
-    else:
-        msg += f"- {most_common1} \n"
-    """
-    
-    # Temperature:
     # msg += f"- {round(max(temps))}° / {round(min(temps))}°\n"
     msg += f"- {round(max(feels_like))}° / {round(min(feels_like))}°\n"
-    # msg += f"- Sun: *{sun_hours}h*\n"
     
-    # Clouds:
-    # msg += f"- Clouds: {round(avg_clouds)}%\n"
+    if avg_wind != "no data":
+        wind_descr = describe_wind(avg_wind)
+        msg += f"- {wind_descr}\n"
 
-    # Rain:
     rain_descr = describe_rain(avg_rain_per_hour)
-    if rain_descr != "No rain":
-        msg += f"- {rain_descr}\n"
-    
-    # Wind:
-    # msg += f"- Wind: {round(min(winds))} - {round(max(winds))} m/s\n"
-    # msg += f"- Gusts: {round(min(gusts))} - {round(max(gusts))} m/s\n"
-    wind_descr = describe_wind(avg_wind)
-    msg += f"- {wind_descr}\n"
-
+    msg += f"- {rain_descr}\n"
 
     if not msg:
         raise ValueError("Weather forecast is empty or None"
@@ -191,9 +146,7 @@ def describe_rain(avg_rain_per_h):
     div_factor = 5  # Since we're talking day averages (between 07:00 and 01:00),
                     # we can't use the thresholds how rain is normally defined.
                     # Even a small daily average can mean a lot of rain at some point.
-    if avg_rain_per_h == "no data":
-        return "No data"
-    elif avg_rain_per_h > 4.5 / div_factor:
+    if avg_rain_per_h > 4.5 / div_factor:
         return "A lot of rain"
     elif avg_rain_per_h > 2.4 / div_factor:
         return "Rainy"
@@ -205,17 +158,52 @@ def describe_rain(avg_rain_per_h):
         return "No rain"
 
 def describe_wind(avg_wind):
-    if avg_wind == "no data":
-        return "No data"
-    elif avg_wind > 7.8:
+    if avg_wind > 7.8:
         return "Super windy!"
     elif avg_wind > 6.5:
         return "Strong wind"
     elif avg_wind > 4.7:
         return "Windy"
     elif avg_wind > 3.5:
-        return "Some wind"
+        return "A bit windy"
     elif avg_wind > 2.8:
         return "Light breeze"
     else:
         return "Calm"
+
+def get_emojis(weather_type) -> str:
+    """ Not used. Just an idea.
+    
+    :return: e.g. [☁️,☁️,🌧,☀️,☁️]
+    """
+    # Translate "weather_type" into emojis
+    return
+    emojis = []
+    for w_type_3h in weather_type:
+        if w_type_3h == "Clouds":
+            emojis.append("☁️")
+        elif w_type_3h == "Clear":
+            emojis.append("☀️")
+        elif w_type_3h == "Rain":
+            emojis.append("🌧")
+        # EV: do same but with weather_description?
+    return emojis
+
+def get_main_weather_type(weather_type) -> str:
+    """ Not used. Just an idea.
+    
+    :return: e.g. "Cloudy / Clear"
+    """
+    return
+    counts = Counter(weather_type)
+    most_common = counts.most_common(2)
+    most_common1 = most_common[0][0]
+    if len(most_common) > 1:
+        most_common2 = most_common[1][0]
+    else:
+        most_common2 = None
+    if most_common2:
+        return f"{most_common1} / {most_common2}"
+    else:
+        return f"{most_common1}"
+        # EV: do same but with weather_description?
