@@ -1,56 +1,47 @@
 # WhatsApp Weather Bot
-Bot that sends daily weather messages using Twilio. Sends today's weather at 07:00 and tomorrow's forecast at 18:00 using GitHub Actions cron jobs that run weather_bot.py on a Fly.io machine.
+Get daily weather forecasts delivered straight to your WhatsApp.
 
-- subscribe for free via web form: https://weather-whatsapp-bot.fly.dev/
+- Automated GitHub Actions trigger weather jobs on a Fly.io server.
+- Sends today's forecast at 07:00 and tomorrow's at 18:00.
+- Easy subscription via web form: https://weather-whatsapp-bot.fly.dev/.
+- Unsubscribe by replying "stop".
 
 ## Example WhatsApp message
-Lund tomorrow:
-- 21° / 16°
-- Clouds: 40.6
-- No rain
-
-## Limitations
-- Twilio Sandbox --- all lot of limitations
-    - but I will change this, I hope !!!
-- currently limited to WhatsApp, no SMS (could easily be changed).
-- currently, all users are assumed to be near Central European Time. Texts are sent around 07:30 and 18:30 CET.
+<img src="images/weather-bot-output.jpg" alt="weather-bot-output" width="60%">
 
 ## Features
-- *auto_stop_machines:* The Fly.io machine sleeps whenever it can, so I have ~0 costs. 🙂 
-The VM only wakes up when the someone browses the sign-up form website, or when GH Actions trigger the weather bot.
-
+- Auto-stop_machines: The Fly.io server automatically sleeps when not in use, keeping costs near zero. It wakes up instantly when someone visits the sign-up page or when GitHub Actions trigger the weather bot. Cold starts are fast.
+- Weather API Integration: Fetches forecasts from OpenWeatherMap.
+- Twilio Integration: Sends WhatsApp messages using Twilio API.
+- Database Storage: Subscriber info stored securely in SQLite.
+- Easy deployment (Fly.io/Gunicorn)
+- Security:
+  - Input validation.
+  - Rate limiting.
+  - Database size limit.
+  - Environment Configuration: Uses .env for secrets and API keys.
 
 # ---------- How to run locally ----------
 
 ## Requirements:
-- get a Twilio Sandbox account for free: https://www.twilio.com/docs/whatsapp/sandbox
+- get a free Twilio Sandbox account: https://www.twilio.com/docs/whatsapp/sandbox
+- get a free weather api key: https://api.openweathermap.org/data/2.5/forecast
+- pip install -r requirements.txt
+- touch db/subscribers.db
 
+1. python app.py -> go to http://127.0.0.1:8080/ -> subscribe
+2. python weather_bot.py -> send messages
 
-## Install -- eller vad säger man? Se Apple Dash
-1. install something?
-2. pip install -r requirements.txt
+## Environment variables (run locally)
+- `TWILIO_ACCOUNT_SID`
+- `TWILIO_AUTH_TOKEN`
+- `WHATSAPP_FROM` – Your Twilio WhatsApp sender number
+- `WEATHER_API_KEY` – Your OpenWeatherMap API key
+- `DB_PATH`=./db/subscribers.db
+- `TOMORROW` – true/false. Get weather forecast for today or tomorrow. Value is set via GitHub Actions.
 
-
-
-# How to run locally:
-1. python app.py -> go to http://127.0.0.1:8080/ and subscribe
-2. python weather_bot.py -> it sends messages to all numbers 
-
-
-## Environmental variables
-- (see list in EV-README)
-
-
-
-
-
-
-# ---------- Future wishlist ----------
-
-## Descriptive messages:
-Compare forecast to the average that time of the year, and just say something like:
-- "kinda hot tomorrow"
-- "kinda rainy tomorrow"
-- "very windy tomorrow, 15° / 6°, but feels like 12° / -2°.
-- link to hourly forecast
-- (in settings, the user can choose time and/or the original format.)
+## Environment variables (Fly.io / GH)
+If you deploy to Fly.io and use GH Action, these secrets must be set on both fly.io and GH:
+- `FLY_API_TOKEN`
+- `FLY_APP_NAME`
+- `MACHINE_ID`

@@ -1,10 +1,6 @@
 .env
-.github/workflows/stop-machine.yml
 db/subscribers.db
+.github/workflows/stop-machine.yml
 
-notes/TODO-NOW.md
-notes/TODO.md
-notes/TODO-big-picture.md
-notes/EV-README.md
 notes2/adams-suggestion
 notes2
