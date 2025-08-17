@@ -39,28 +39,41 @@ footer { margin-top:20px; color:#666; font-size:0.9rem; }
   line-height: 1.4;
 }
 
+/* feature highlight */
 .info-forecast {
-  background: #b4ffda98;
-  border-left: 4px solid #00ff6a71;
-  max-width: 90%;        /* Slightly narrower than main container */
+  background: linear-gradient(135deg, #f9fefb, #e9f6ed);
+  border-radius: 12px;
+  padding: 16px 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  font-size: 0.95rem;
+  color: #1d3a29; /* dark greenish text */
 }
 
+.info-forecast ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.info-forecast li {
+  margin: 6px 0;
+  padding-left: 20px;
+  position: relative;
+}
+
+.info-forecast li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 9px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #34a853, #0c7a43);
+}
+
+/* thank-you page */
 .info-notes {
   background: #f0f4ff;
   border-left: 4px solid #0ba6ff70;
-}
-
-.info ul {
-  margin: 0;
-  padding-left: 18px;
-}
-
-.info li {
-  margin-bottom: 3px;
-}
-
-.info li ul {
-  margin-top: 2px;
-  padding-left: 16px;
-  list-style-type: disc;
 }

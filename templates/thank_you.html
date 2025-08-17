@@ -9,7 +9,16 @@
 <body>
   <main class="container">
     <h1>Thank you!</h1>
-    <p>Your subscription was saved. You should receive messages at the times you selected.</p>
+
+    <div class="info info-notes">
+      <p><strong>Important:</strong> Current limitations due to using Twilio's free "Sandbox" for WhatsApp:</p>
+      <ul>
+        <li>You need to send a WhatsApp message with the text "join thee-small" to +14155238886.</li>
+        <li>To keep receiving daily messages, do this every 24 hours.</li>
+      </ul>
+    </div>
+
+    <p>Your subscription was saved.</p>
     <p><a href="{{ url_for('form') }}">Back to form</a></p>
   </main>
 </body>
