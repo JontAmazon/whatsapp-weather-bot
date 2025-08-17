@@ -97,17 +97,18 @@ def fetch_weather(location, lon, lat, tomorrow: bool, forecast_days: int) -> str
         # 24 hours:
         temps.append(item["main"]["temp"])
         feels_like.append(item["main"]["feels_like"])
-        winds.append(item["wind"]["speed"])
-        gusts.append(item["wind"].get("gust", {0}))
         
         if dt.time().hour < 7 or dt.time().hour > 22:
-            # not such an interesting interval for rain/clouds/weather type --> skip!
+            # not such an interesting interval for rain/clouds/wind/weather type --> skip!
             # NOTE: 7-22 gives us an interval from 7:00 to 01:00, since the weather data is 3h intervals.
             continue
         
         # Between 7:00 - 01:00:
         clouds.append(item["clouds"]["all"])
         rains.append(item.get("rain", {}).get("3h", 0))
+        winds.append(item["wind"]["speed"])
+        gusts.append(item["wind"].get("gust", {0}))
+
         weather_type.append(item["weather"][0]["main"])
         weather_description.append(item["weather"][0]["description"])
         time_of_day.append(dt.time())
@@ -169,15 +170,15 @@ def fetch_weather(location, lon, lat, tomorrow: bool, forecast_days: int) -> str
     # msg += f"- Clouds: {round(avg_clouds)}%\n"
 
     # Rain:
-    if avg_rain_per_hour < 0.1:
-        msg += f"- No rain\n"
-    else:
-        msg += f"- Rain: {avg_rain_per_hour:.2f} mm/h\n"
-
+    rain_descr = describe_rain(avg_rain_per_hour)
+    if rain_descr != "No rain":
+        msg += f"- {rain_descr}\n"
+    
     # Wind:
-    # I don't know if this is interesting enough...
     # msg += f"- Wind: {round(min(winds))} - {round(max(winds))} m/s\n"
     # msg += f"- Gusts: {round(min(gusts))} - {round(max(gusts))} m/s\n"
+    wind_descr = describe_wind(avg_wind)
+    msg += f"- {wind_descr}\n"
 
 
     if not msg:
@@ -186,3 +187,35 @@ def fetch_weather(location, lon, lat, tomorrow: bool, forecast_days: int) -> str
 
     return msg
 
+def describe_rain(avg_rain_per_h):
+    div_factor = 5  # Since we're talking day averages (between 07:00 and 01:00),
+                    # we can't use the thresholds how rain is normally defined.
+                    # Even a small daily average can mean a lot of rain at some point.
+    if avg_rain_per_h == "no data":
+        return "No data"
+    elif avg_rain_per_h > 4.5 / div_factor:
+        return "A lot of rain"
+    elif avg_rain_per_h > 2.4 / div_factor:
+        return "Rainy"
+    elif avg_rain_per_h > 1.1 / div_factor:
+        return "Some rain"
+    elif avg_rain_per_h > 0.3 / div_factor:
+        return "Maybe some rain"
+    else:
+        return "No rain"
+
+def describe_wind(avg_wind):
+    if avg_wind == "no data":
+        return "No data"
+    elif avg_wind > 7.8:
+        return "Super windy!"
+    elif avg_wind > 6.5:
+        return "Strong wind"
+    elif avg_wind > 4.7:
+        return "Windy"
+    elif avg_wind > 3.5:
+        return "Some wind"
+    elif avg_wind > 2.8:
+        return "Light breeze"
+    else:
+        return "Calm"
