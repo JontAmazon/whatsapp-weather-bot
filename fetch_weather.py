@@ -158,15 +158,15 @@ def describe_rain(avg_rain_per_h):
         return "No rain"
 
 def describe_wind(avg_wind):
-    if avg_wind > 7.8:
+    if avg_wind > 8.2:
         return "Super windy!"
-    elif avg_wind > 6.5:
+    elif avg_wind > 6.7:
         return "Strong wind"
-    elif avg_wind > 4.7:
+    elif avg_wind > 5.3:
         return "Windy"
-    elif avg_wind > 3.5:
+    elif avg_wind > 3.7:
         return "A bit windy"
-    elif avg_wind > 2.8:
+    elif avg_wind > 2.9:
         return "Light breeze"
     else:
         return "Calm"
