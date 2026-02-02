@@ -45,3 +45,4 @@ If you deploy to Fly.io and use GH Action, these secrets must be set on both fly
 - `FLY_API_TOKEN`
 - `FLY_APP_NAME`
 - `MACHINE_ID`
+
